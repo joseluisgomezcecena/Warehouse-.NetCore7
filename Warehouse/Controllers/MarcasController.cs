@@ -20,6 +20,8 @@ namespace Warehouse.Controllers
         private readonly IConfiguration _configuration; //se agrega para poder acceder a registros por pagina de la configuración.
         private readonly INotyfService _notyf; //se agrega para poder enviar notificaciones.
 
+
+
         public MarcasController(WarehouseContext context, IConfiguration configuration, INotyfService notyf)//constructor.
         {
             _context = context;
@@ -27,8 +29,11 @@ namespace Warehouse.Controllers
             _notyf = notyf; //se agrega para poder enviar notificaciones.
         }
 
+
+
+
         // GET: Marcas
-        public async Task<IActionResult> Index(ListadoMarcasViewModel ViewModel) //se crea un folder de ViewModels y se agrega la clase ListadoMarcasViewModel.cs
+        public async Task<IActionResult> Index(ListViewModel<Marca> ViewModel) //se crea un folder de ViewModels y se agrega la clase ListadoMarcasViewModel.cs
         {
             var registrosPorPagina = _configuration.GetValue<int>("RegistrosPorPagina", 5); //se agrega para poder acceder a registros por pagina de la configuración.
 
@@ -43,7 +48,7 @@ namespace Warehouse.Controllers
 
             var numeroDePagina = ViewModel.Pagina ?? 1;
 
-            ViewModel.Marcas = await query.ToPagedListAsync(numeroDePagina, registrosPorPagina);
+            ViewModel.Records = await query.ToPagedListAsync(numeroDePagina, registrosPorPagina);
 
             return View(ViewModel);
         }

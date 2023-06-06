@@ -3,7 +3,7 @@
 @using X.PagedList.Web.Common;
 
 
-@model ListadoMarcasViewModel
+@model ListViewModel<Marca>
 
 @{
     ViewData["Title"] = "Index";
@@ -31,13 +31,13 @@
     <thead class="bg-primary text-white-50">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Marcas[0].Nombre)
+                @Html.DisplayNameFor(model => model.Records[0].Nombre)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Marcas) {
+@foreach (var item in Model.Records) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Nombre)
@@ -50,7 +50,7 @@
     </tbody>
 </table>
 
-@Html.PagedListPager(Model.Marcas, page => Url.Action("Index", new {
+@Html.PagedListPager(Model.Records, page => Url.Action("Index", new {
     Pagina = page,
     SearchTerm = Model.SearchTerm
 }),
