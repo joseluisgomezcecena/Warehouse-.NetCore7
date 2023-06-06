@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -17,11 +18,13 @@ namespace Warehouse.Controllers
     {
         private readonly WarehouseContext _context;
         private readonly IConfiguration _configuration; //se agrega para poder acceder a registros por pagina de la configuración.
+        private readonly INotyfService _notyf; //se agrega para poder enviar notificaciones.
 
-        public MarcasController(WarehouseContext context, IConfiguration configuration)
+        public MarcasController(WarehouseContext context, IConfiguration configuration, INotyfService notyf)//constructor.
         {
             _context = context;
             _configuration = configuration; //se agrega para poder acceder a registros por pagina de la configuración.
+            _notyf = notyf; //se agrega para poder enviar notificaciones.
         }
 
         // GET: Marcas
@@ -82,7 +85,8 @@ namespace Warehouse.Controllers
                 //se agrega este bloque de codigo para evitar que se agregue una marca con el mismo nombre.
                 if (_context.Marcas != null && _context.Marcas.Any(m => m.Nombre == marca.Nombre))
                 {
-                    ModelState.AddModelError("Nombre", "Ya existe una marca con el mismo nombre.");
+                    //ModelState.AddModelError("Nombre", "Ya existe una marca con el mismo nombre.");
+                    _notyf.Warning("Ya existe una marca con el mismo nombre.");
                     return View(marca);
                 }
                 
@@ -91,10 +95,12 @@ namespace Warehouse.Controllers
                 {
                     _context.Add(marca);
                     await _context.SaveChangesAsync();
+                    _notyf.Success($"La marca {marca.Nombre} se ha creado correctamente.");
                 }
                 catch (DbUpdateException)
                 {
-                    ModelState.AddModelError("", "Lo sentimos, ha ocurrido un error. Intenta otra vez."); //se agrega ya que cuando hay una excepción de estas no es un error de programación, por lo general son factores externos.
+                    //ModelState.AddModelError("", "Lo sentimos, ha ocurrido un error. Intenta otra vez."); //se agrega ya que cuando hay una excepción de estas no es un error de programación, por lo general son factores externos.
+                    _notyf.Error("Lo sentimos, ha ocurrido un error. Intenta otra vez.");
                     return View(marca);
                 }
                 return RedirectToAction(nameof(Index));
@@ -138,7 +144,8 @@ namespace Warehouse.Controllers
                 //Este bloque de código se agrega para evitar que se agregue una marca con el mismo nombre. Agregue el Id en el query.
                 if (_context.Marcas != null && _context.Marcas.Any(m => m.Nombre == marca.Nombre && m.Id != marca.Id))
                 {
-                    ModelState.AddModelError("Nombre", "Ya existe una marca con el mismo nombre.");
+                    //ModelState.AddModelError("Nombre", "Ya existe una marca con el mismo nombre.");
+                    _notyf.Warning("Ya existe una marca con el mismo nombre.");
                     return View(marca);
                 }
 
@@ -148,6 +155,7 @@ namespace Warehouse.Controllers
                 {
                     _context.Update(marca);
                     await _context.SaveChangesAsync();
+                    _notyf.Success($"La marca {marca.Nombre} se ha actualizado correctamente.");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -196,6 +204,7 @@ namespace Warehouse.Controllers
             if (marca != null)
             {
                 _context.Marcas.Remove(marca);
+                _notyf.Success($"La marca {marca.Nombre} se ha eliminado correctamente.");
             }
             
             await _context.SaveChangesAsync();

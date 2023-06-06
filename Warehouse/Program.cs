@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AspNetCoreHero.ToastNotification;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Warehouse.Data;
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,14 @@ builder.Services.AddDbContext<WarehouseContext>(options =>
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddNotyf(config =>  //para agregar notificaciones bonitas.
+{
+    config.DurationInSeconds = 10;
+    config.IsDismissable = true;
+    config.Position = NotyfPosition.TopRight;
+});
+
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter(); //se agrega para que se muestren los errores de la base de datos, despues de instalar Microsoft.Diagnostics.EntityFrameworkCore
 
